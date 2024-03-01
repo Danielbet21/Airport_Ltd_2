@@ -18,8 +18,6 @@ int compareByCode(const void* port1, const void* port2) {
 int	addAirport(AirportManager* pManager){
 	// create new airport to add the list
 	Airport* pPort = (Airport*)malloc(sizeof(Airport));
-	//======================================================================================================
-	//dont forget to free the memory
 	if (!pPort){
 		free(pPort);
 		return 0;
@@ -30,7 +28,7 @@ int	addAirport(AirportManager* pManager){
 		return 0;
 	}
 
-	// add the new airport to the list
+	// TODO: add the new airport to the list
 	//L_insert_sort_by_code(pManager->AirportList,pPort,(int)compareByCode);
 	return 1;
 }
@@ -50,19 +48,16 @@ int  initAirport(Airport* pPort, AirportManager* pManager){
 }
 
 Airport* findAirportByCode(const AirportManager* pManager, const char* code){
-	NODE n = pManager->AirportList.head;
-	int count = 0;
-	while(n.next != NULL){
-		count++;
-		n = *n.next;
+		Airport pPort = { .code = code };//initialize only the code of the airport
+
+		NODE* res = L_find(pManager->AirportList.head.next, &pPort, compareByCode);
+		if (res == NULL) {
+			return NULL;
+		}
+		else {
+			return res;
+		}
 	}
-	//TODO: use qsort and bsearch ---- check if it works
-	Airport* pPort = NULL;
-	Airport temp = {"","",code}; // initializing only the code segment
-//	qsort(&pManager->AirportList,count,sizeof(Airport), compareByCode);
-	pPort = (Airport*)bsearch(&temp, pManager->AirportList.head.next, count, sizeof(Airport), compareByCode);
-	return NULL;
-}
 
 int checkUniqeCode(const char* code,const AirportManager* pManager){
 	Airport* port = findAirportByCode(pManager, code);

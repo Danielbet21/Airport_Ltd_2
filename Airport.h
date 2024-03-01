@@ -19,7 +19,7 @@ void	changeNameOneWord(char* name, const char* word);
 void	changeName(char* name,int count, char** wordsArray);
 
 void    getAirportCode(char* code);
-void	printAirport(const Airport* pPort);
+void	printAirport(const void* pPort);
 void	freeAirport(Airport* pPort);
 
 #endif

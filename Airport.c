@@ -38,10 +38,14 @@ int	initAirportNoCode(Airport* pPort)
 	return 1;
 }
 
-void	printAirport(const Airport* pPort)
-{
-	printf("Airport name:%-20s\t", pPort->name);
-	printf("Country: %-20s\t Code:%s\n", pPort->country, pPort->code);
+void printAirport(const void* pPort){
+	if (!pPort) {
+		printf("Error airport no airport\n");
+		return; 
+	}
+	const Airport* pAir = (const Airport*)pPort;
+	printf("Airport name:%-20s\t", pAir->name);
+	printf("Country: %-20s\t Code:%s\n", pAir->country, pAir->code);
 
 }
 
@@ -157,8 +161,7 @@ void getAirportCode(char* code)
 	strcpy(code, temp);
 }
 
-void	freeAirport(Airport* pPort)
-{
+void freeAirport(Airport* pPort){
 	free(pPort->name);
 	free(pPort->country);
 }
