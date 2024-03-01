@@ -17,4 +17,5 @@ int		checkUniqeCode(const char* code, const AirportManager* pManager);
 void	printAirports(const AirportManager* pManager);
 void	freeManager(AirportManager* pManager);
 void	freeAirportArr(AirportManager* pManager);
+int 	lengthList(NODE* pNode);
 #endif

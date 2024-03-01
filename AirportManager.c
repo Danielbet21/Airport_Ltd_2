@@ -15,10 +15,10 @@ int compareByCode(const void* port1, const void* port2) {
 	return strcmp(((Airport*)port1)->code, ((Airport*)port2)->code);
 }
 
-int	addAirport(AirportManager* pManager){
+int	addAirport(AirportManager* pManager) {
 	// create new airport to add the list
 	Airport* pPort = (Airport*)malloc(sizeof(Airport));
-	if (!pPort){
+	if (!pPort) {
 		free(pPort);
 		return 0;
 	}
@@ -27,10 +27,35 @@ int	addAirport(AirportManager* pManager){
 		freeAirport(pPort);
 		return 0;
 	}
-
-	// TODO: add the new airport to the list
-	//L_insert_sort_by_code(pManager->AirportList,pPort,(int)compareByCode);
+	// add- node to the Airportlist as required
+	insertAirportToList(&pManager->AirportList.head, pPort);
 	return 1;
+}
+
+void insertAirportToList(AirportManager* pManager, Airport* pPort) {
+	NODE* pMan = &pManager->AirportList.head.next;
+	while (pMan->next != NULL) {
+		Airport* pAirport = (Airport*)pMan->next->key;
+		int res = strcmp(pAirport->code, pPort->code);
+		//res cant be 0 because the code is unique
+		if (res < 0) { // the code need to be before the next node
+			L_insert(pMan, pPort);
+		}
+		else if (res > 0) {
+			L_insert(pMan->next, pPort);
+		}
+		pMan = pMan->next;
+	}
+}
+
+int lengthList(NODE* head) {
+	NODE* temp = head;
+	int count = 0;
+	while (temp != NULL) {
+		count++;
+		temp = temp->next;
+	}
+	return count;
 }
 
 int  initAirport(Airport* pPort, AirportManager* pManager){
@@ -55,7 +80,7 @@ Airport* findAirportByCode(const AirportManager* pManager, const char* code){
 			return NULL;
 		}
 		else {
-			return res;
+			return (Airport*)res;
 		}
 	}
 
@@ -73,11 +98,6 @@ void printAirports(const AirportManager* pManager){
 	L_print(&pManager->AirportList, printAirport);
 }
 
-void	freeManager(AirportManager* pManager){
-	freeAirportArr(pManager);
-}
-
-
-void	freeAirportArr(AirportManager* pManager){
-	//bulid in func in genlist
+void freeManager(AirportManager* pManager){
+	L_free(&pManager->AirportList, freeAirport);
 }
