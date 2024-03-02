@@ -73,7 +73,7 @@ Airport* findAirportByCode(const AirportManager* pManager, const char* code){
 		if (pAir == NULL) {
 			return NULL;
 		}
-		strcpy(pAir->code, code); //TODO: free pPort and check if this works
+		strcpy(pAir->code, code); //TODO: free pPort
 
 		NODE* res = L_find(pManager->AirportList.head.next, pAir, compareByCode);
 		if (res == NULL) {

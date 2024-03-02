@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "Airline.h"
+#include "Date.h"
 #include "Airport.h"
 #include "General.h"
 
@@ -14,9 +15,10 @@ void	initAirline(Airline* pComp)
 	pComp->flightCount = 0;
 	pComp->planeArr = NULL;
 	pComp->planeCount = 0;
+	pComp->type = None;
 }
 
-int	addFlight(Airline* pComp,const AirportManager* pManager){
+int	addFlight(Airline* pComp, const AirportManager* pManager) {
 	NODE n = pManager->AirportList.head;
 	int count = 0;
 	while (n.next != NULL) {
@@ -28,7 +30,7 @@ int	addFlight(Airline* pComp,const AirportManager* pManager){
 		printf("There are not enough airport to set a flight\n");
 		return 0;
 	}
-	if(pComp->planeCount == 0)
+	if (pComp->planeCount == 0)
 	{
 		printf("There is no plane in company\n");
 		return 0;
@@ -37,10 +39,10 @@ int	addFlight(Airline* pComp,const AirportManager* pManager){
 	Flight* pFlight = (Flight*)calloc(1, sizeof(Flight));
 	if (!pFlight)
 		return 0;
-	
+
 	Plane* thePlane = FindAPlane(pComp);
 	printAirports(pManager);
-	initFlight(pFlight, thePlane,pManager);
+	initFlight(pFlight, thePlane, pManager);
 
 	pComp->flightArr = (Flight**)realloc(pComp->flightArr, (pComp->flightCount + 1) * sizeof(Flight*));
 	if (!pComp->flightArr)
@@ -66,16 +68,16 @@ int		addPlane(Airline* pComp)
 Plane* FindAPlane(Airline* pComp)
 {
 	printf("Choose a plane from list, type its serial Number\n");
-	printPlanesArr(pComp->planeArr,pComp->planeCount);
+	printPlanesArr(pComp->planeArr, pComp->planeCount);
 	int sn;
 	Plane* temp = NULL;
 	do {
 		scanf("%d", &sn);
-		temp = findPlaneBySN(pComp->planeArr,pComp->planeCount, sn);
+		temp = findPlaneBySN(pComp->planeArr, pComp->planeCount, sn);
 		if (!temp)
 			printf("No plane with that serial number! Try again!\n");
 	} while (temp == NULL);
-	 
+
 	return temp;
 }
 
@@ -114,7 +116,7 @@ void	doPrintFlightsWithPlaneType(const Airline* pComp)
 			count++;
 		}
 	}
-	if(count == 0)
+	if (count == 0)
 		printf("Sorry - could not find a flight with plane type %s:\n", GetPlaneTypeStr(type));
 	printf("\n");
 }
@@ -139,23 +141,79 @@ void	freeCompany(Airline* pComp)
 	free(pComp->name);
 }
 
-
-int compareFlights( const void* flight1, const void* flight2, const void* type) {
-	if(!flight1 || !flight2)
+// compare types
+int compareFlightBySource(const void* flight1, const void* flight2) {
+	if (!flight1 || !flight2)
 		return 0;
 	const Flight* pFlight1 = *(const Flight**)flight1;
 	const Flight* pFlight2 = *(const Flight**)flight2;
 
-	if(type == source){
-		return strcmp(pFlight1->sourceCode, pFlight2->sourceCode);
-	}
-	else if (type == destanation) {
-		return strcmp(pFlight1->destCode, pFlight2->destCode);
-	}
-	else if (type == date) {
-		return strcmp(pFlight1, pFlight2);
-	}
-	else {
+	return strcmp(pFlight1->sourceCode, pFlight2->sourceCode);
+}
+
+int compareFlightByDest(const void* flight1, const void* flight2) {
+	if (!flight1 || !flight2)
 		return 0;
+	const Flight* pFlight1 = *(const Flight**)flight1;
+	const Flight* pFlight2 = *(const Flight**)flight2;
+
+	return strcmp(pFlight1->destCode, pFlight2->destCode);
+
+}
+
+// sorting types
+void sortBySourceCode(Airline* pComp) {
+	qsort(pComp->flightArr, pComp->flightCount, sizeof(Flight*), compareFlightBySource);
+}
+void sortByDestCode(Airline* pComp) {
+	qsort(pComp->flightArr, pComp->flightCount, sizeof(Flight*), compareFlightByDest);
+}
+void sortByDate(Airline* pComp) {
+	qsort(pComp->flightArr, pComp->flightCount, sizeof(Flight*), compareFlightByDate);
+}
+
+
+void sortFlightsMenu(Airline* air, Flight** arr, int size) {
+	int op = 0;
+	while (1) {
+		printf("Base on what field do you want to sort ?\n"
+			"Enter 1 for Source Code\n"
+			"Enter 2 for Dest Code\n"
+			"Enter 3 for Date\n");
+		op = scanf("%d", &op);
+		switch (op) {
+		case 1:
+			air->type = source;
+			sortBySourceCode(air);
+			break;
+
+		case 2:
+			air->type = destanation;
+			sortByDestCode(air);
+			break;
+
+		case 3:
+			air->type = date;
+			sortByDate(air);
+			break;
+		}
 	}
+}
+
+// search
+Flight* searchFlights(Airline air, Flight toSearch) {
+	if (air.type == None) {
+		printf("The search cannot be performed, array not sorted\n");
+		return NULL;
+	}
+	else if (air.type == source) {
+		return (Flight*)bsearch(&toSearch, air.flightArr, air.flightCount, sizeof(Flight), compareFlightBySource);
+	}
+	else if (air.type == destanation) {
+		return (Flight*)bsearch(&toSearch, air.flightArr, air.flightCount, sizeof(Flight), compareFlightByDest);
+	}
+	else if (air.type == date) {
+		return (Flight*)bsearch(&toSearch, air.flightArr, air.flightCount, sizeof(Flight), compareFlightByDate);
+	}
+	return NULL;
 }

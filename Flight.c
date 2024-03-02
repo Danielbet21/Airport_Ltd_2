@@ -71,3 +71,11 @@ Airport* setAiportToFlight(const AirportManager* pManager, const char* msg)
 
 	return port;
 }
+
+void    compareFlightByDate(const void* flight1, const void* flight2) {
+	Flight* f1 = *(Flight**)flight1;
+	Flight* f2 = *(Flight**)flight2;
+
+	return compareDates(&f1->date, &f2->date);
+
+}

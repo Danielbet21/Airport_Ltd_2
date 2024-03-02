@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "General.h"
 #include "Date.h"
+#include "Flight.h"
 
 const int DAY_MONTHS[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
 #define SPECIAL_TAV '#'
@@ -48,4 +49,14 @@ int	 checkDate(char* date, Date* pDate)
 void printDate(const Date* pDate)
 {
 	printf("Date: %d/%d/%d", pDate->day, pDate->month, pDate->year);
+}
+
+int compareDates(const void* pDate1, const void* pDate2) {
+	Date* dateA = (Date*)pDate1;
+	Date* dateB = (Date*)pDate2;
+	if (dateA->year != dateB->year)
+		return dateA->year - dateB->year;
+	if (dateA->month != dateB->month)
+		return dateA->month - dateB->month;
+	return dateA->day - dateB->day;
 }
