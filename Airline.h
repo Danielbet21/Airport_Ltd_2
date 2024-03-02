@@ -4,6 +4,13 @@
 #include "Flight.h"
 #include "AirportManager.h"
 
+typedef enum {
+	source, destanation, date, None, eNofSortType
+} ePlaneType;
+
+static const char* SortType[eNofSortType]
+= { "source", "destanation","date", "None"};
+
 typedef struct
 {
 	char*		name;
@@ -24,6 +31,7 @@ void	doPrintFlightsWithPlaneType(const Airline* pComp);
 void	freeFlightArr(Flight** arr, int size);
 void	freePlanes(Plane* arr, int size);
 void	freeCompany(Airline* pComp);
+int compareByDest(const void* flight1, const void* flight2);
 
 #endif
 

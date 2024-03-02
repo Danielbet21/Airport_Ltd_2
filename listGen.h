@@ -40,4 +40,6 @@ BOOL L_free(LIST* pList, void (*freeFunc)(void*));					// free list memory
 
 int L_print(const LIST* pList, void(*print)(const void*));					// print the list content
 
+NODE* L_insertAirportSorted(LIST* pList, DATA Value, int(*compare)(const void*, const void*));	// add new node to a sorted list
+
 #endif

@@ -12,6 +12,7 @@ void test_addAirport() {
     AirportManager manager;
     initManager(&manager);
     assert(addAirport(&manager) == 1);
+    L_print(&manager.AirportList, printAirport);
 }
 
 void test_initAirport() {
@@ -25,7 +26,8 @@ void test_findAirportByCode1() {
     printf("test 1\n");
     AirportManager manager;
     initManager(&manager);
-    addAirport(&manager);
+    printf("NOTE: insert AAA to pass the test\n");
+    addAirport(&manager); //TODO: this make the code to crash
     // Assuming the code of the added airport is "AAA"
     assert(findAirportByCode(&manager, "AAA") != NULL);
     assert(findAirportByCode(&manager, "ABC") == NULL);
@@ -49,10 +51,10 @@ void test_freeManager() {
 }
 
 int main() {
-    //test_initManager();
-    test_addAirport();
-    //test_initAirport();
-    //test_findAirportByCode1();
+   // test_initManager();
+    //test_addAirport();
+   // test_initAirport();
+    test_findAirportByCode1();
     //test_checkUniqeCode();
     //test_freeManager();
 

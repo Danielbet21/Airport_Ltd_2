@@ -135,3 +135,24 @@ int L_print(const LIST* pList, void(*print)(const void*))
 	printf("\n");
 	return c;
 }
+
+NODE* L_insertAirportSorted(LIST* pList, DATA Value, int(*compare)(const void*, const void*)) {
+	if (pList == NULL) {
+		return NULL;
+	}
+	NODE* ptr = &pList->head;
+	if (ptr == NULL) {
+		return NULL;
+	}
+	NODE* nextPtr = ptr->next;
+
+	while (nextPtr != NULL) {
+		if (compare(nextPtr->key, Value) > 0)
+		{
+			break;
+		}
+		ptr = nextPtr;
+		nextPtr = nextPtr->next;
+	}
+	return L_insert(ptr, Value);
+}

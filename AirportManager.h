@@ -16,6 +16,7 @@ Airport* findAirportByCode(const AirportManager* pManager, const char* code);
 int		checkUniqeCode(const char* code, const AirportManager* pManager);
 void	printAirports(const AirportManager* pManager);
 void	freeManager(AirportManager* pManager);
-void	freeAirportArr(AirportManager* pManager);
 int 	lengthList(NODE* pNode);
+int		compareByCode(const void* port1, const void* port2);
+
 #endif

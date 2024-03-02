@@ -11,15 +11,10 @@ int	initManager(AirportManager* pManager){
 	return 1;
 }
 
-int compareByCode(const void* port1, const void* port2) {
-	return strcmp(((Airport*)port1)->code, ((Airport*)port2)->code);
-}
-
 int	addAirport(AirportManager* pManager) {
 	// create new airport to add the list
 	Airport* pPort = (Airport*)malloc(sizeof(Airport));
 	if (!pPort) {
-		free(pPort);
 		return 0;
 	}
 	// initialize the airport
@@ -27,25 +22,15 @@ int	addAirport(AirportManager* pManager) {
 		freeAirport(pPort);
 		return 0;
 	}
-	// add- node to the Airportlist as required
-	insertAirportToList(&pManager->AirportList.head, pPort);
+	// add- node to the Airportlist as required 
+	// TODO: make sure the list is sorted by code
+	NODE* dumi = &pManager->AirportList.head;
+	dumi = L_insertAirportSorted(&pManager->AirportList, pPort, compareByCode);
+		if (dumi == NULL) {
+			free(dumi);
+			freeAirport(pPort);
+		}
 	return 1;
-}
-
-void insertAirportToList(AirportManager* pManager, Airport* pPort) {
-	NODE* pMan = &pManager->AirportList.head.next;
-	while (pMan->next != NULL) {
-		Airport* pAirport = (Airport*)pMan->next->key;
-		int res = strcmp(pAirport->code, pPort->code);
-		//res cant be 0 because the code is unique
-		if (res < 0) { // the code need to be before the next node
-			L_insert(pMan, pPort);
-		}
-		else if (res > 0) {
-			L_insert(pMan->next, pPort);
-		}
-		pMan = pMan->next;
-	}
 }
 
 int lengthList(NODE* head) {
@@ -57,6 +42,17 @@ int lengthList(NODE* head) {
 	}
 	return count;
 }
+
+int compareByCode(const void* port1, const void* port2) {
+	if (!port1 || !port2)
+		return 0;
+	const Airport* pPort1 = (const Airport*)port1;
+	const Airport* pPort2 = (const Airport*)port2;
+
+	return strcmp(((Airport*)pPort1)->code, ((Airport*)pPort2)->code);
+}
+
+
 
 int  initAirport(Airport* pPort, AirportManager* pManager){
 	while (1){
@@ -73,14 +69,18 @@ int  initAirport(Airport* pPort, AirportManager* pManager){
 }
 
 Airport* findAirportByCode(const AirportManager* pManager, const char* code){
-		Airport pPort = { .code = code };//initialize only the code of the airport
+		Airport* pAir = malloc(sizeof(Airport));
+		if (pAir == NULL) {
+			return NULL;
+		}
+		strcpy(pAir->code, code); //TODO: free pPort and check if this works
 
-		NODE* res = L_find(pManager->AirportList.head.next, &pPort, compareByCode);
+		NODE* res = L_find(pManager->AirportList.head.next, pAir, compareByCode);
 		if (res == NULL) {
 			return NULL;
 		}
 		else {
-			return (Airport*)res;
+			return (Airport*)res->key;
 		}
 	}
 

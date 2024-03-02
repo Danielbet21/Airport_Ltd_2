@@ -138,3 +138,24 @@ void	freeCompany(Airline* pComp)
 	free(pComp->planeArr);
 	free(pComp->name);
 }
+
+
+int compareFlights( const void* flight1, const void* flight2, const void* type) {
+	if(!flight1 || !flight2)
+		return 0;
+	const Flight* pFlight1 = *(const Flight**)flight1;
+	const Flight* pFlight2 = *(const Flight**)flight2;
+
+	if(type == source){
+		return strcmp(pFlight1->sourceCode, pFlight2->sourceCode);
+	}
+	else if (type == destanation) {
+		return strcmp(pFlight1->destCode, pFlight2->destCode);
+	}
+	else if (type == date) {
+		return strcmp(pFlight1, pFlight2);
+	}
+	else {
+		return 0;
+	}
+}
