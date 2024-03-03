@@ -60,3 +60,28 @@ int compareDates(const void* pDate1, const void* pDate2) {
 		return dateA->month - dateB->month;
 	return dateA->day - dateB->day;
 }
+
+int saveDateToBinFile(FILE* file, const Date* pDate) {
+	if (file == NULL || pDate == NULL) {
+		return 0;
+	}
+
+	if (writeGeneralToBinFile(file, pDate, sizeof(Date)) != 1) {
+		return 0;
+	}
+	return 1;
+}
+Date readDateFromBinFile(FILE* file) {
+	Date date;
+	date.day = 0;
+	date.month = 0;
+	date.year = 0;
+	if (file == NULL) {
+		return date;
+	}
+	if (readGeneralFromBinFile(file, &date, sizeof(Date)) != 1) {
+		return date;
+	}
+
+	return date;
+}

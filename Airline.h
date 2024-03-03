@@ -22,6 +22,7 @@ typedef struct
 }Airline;
 
 void	initAirline(Airline* pComp);
+int		saveAirlineToFile(const Airline* pComp, const char* fileName);
 int		addFlight(Airline* pComp,const AirportManager* pManager);
 int		addPlane(Airline* pComp);
 Plane*	FindAPlane(Airline* pComp);
@@ -33,7 +34,7 @@ void	freeFlightArr(Flight** arr, int size);
 void	freePlanes(Plane* arr, int size);
 void	freeCompany(Airline* pComp);
 
-void sortFlightsMenu(Airline* air, Flight** arr, int size);
+void sortFlight(Airline* air);
 void sortBySourceCode(Airline* pComp);
 void sortByDestCode(Airline* pComp);
 void sortByDate(Airline* pComp);
@@ -41,6 +42,6 @@ void sortByDate(Airline* pComp);
 int compareFlightByDest(const void* flight1, const void* flight2);
 int compareFlightBySource(const void* flight1, const void* flight2);
 
-Flight* searchFlights(Airline air, Flight toSearch);
+Flight* findFlight(Airline* air);
 #endif
 

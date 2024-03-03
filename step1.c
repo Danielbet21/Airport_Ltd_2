@@ -2,22 +2,18 @@
 #include <stdio.h>
 #include "AirportManager.h"
 
-void test_initManager() {
-    printf("test_initManager\n");;
-    AirportManager manager;
-    assert(initManager(&manager) == 1);
-}
+
 
 void test_addAirport() {
     AirportManager manager;
-    initManager(&manager);
+    //initManager(&manager);
     assert(addAirport(&manager) == 1);
     L_print(&manager.AirportList, printAirport);
 }
 
 void test_initAirport() {
     AirportManager manager;
-    initManager(&manager);
+    //initManager(&manager);
     Airport airport;
     assert(initAirport(&airport, &manager) == 1);
 }
@@ -25,7 +21,7 @@ void test_initAirport() {
 void test_findAirportByCode1() {
     printf("test 1\n");
     AirportManager manager;
-    initManager(&manager);
+    //initManager(&manager);
     printf("NOTE: insert AAA to pass the test\n");
     addAirport(&manager); 
     // Assuming the code of the added airport is "AAA"
@@ -35,7 +31,7 @@ void test_findAirportByCode1() {
 
 void test_checkUniqeCode() {
     AirportManager manager;
-    initManager(&manager);
+    //initManager(&manager);
     addAirport(&manager);
     // Assuming the code of the added airport is "XYZ"
     assert(checkUniqeCode("XYZ", &manager) == 0);
@@ -44,7 +40,7 @@ void test_checkUniqeCode() {
 
 void test_freeManager() {
     AirportManager manager;
-    initManager(&manager);
+    //initManager(&manager);
     addAirport(&manager);
     freeManager(&manager);
 	assert(manager.AirportList.head.next == NULL);

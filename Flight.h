@@ -14,12 +14,15 @@ typedef struct
 	Date	date;
 }Flight;
 
-void	initFlight(Flight* pFlight, Plane* thePlane,const AirportManager* pManager);
-int		isFlightFromSourceAirport(const Flight* pFlight, const char* code);
-int		isFlightToDestAirport(const Flight* pFlight, const char* code);
-void	printFlight(const Flight* pFlight);
+void		initFlight(Flight* pFlight, Plane* thePlane,const AirportManager* pManager);
+int			isFlightFromSourceAirport(const Flight* pFlight, const char* code);
+int			isFlightToDestAirport(const Flight* pFlight, const char* code);
+void		printFlight(const Flight* pFlight);
 Airport*	setAiportToFlight(const AirportManager* pManager, const char* msg);
-int		isPlaneTypeInFlight(const Flight* pFlight, ePlaneType type);
-void    compareFlightByDate(const void* flight1, const void* flight2);
-
+int			isPlaneTypeInFlight(const Flight* pFlight, ePlaneType type);
+int			compareFlightByDate(const void* flight1, const void* flight2);
+int			saveFlightToBinFile(FILE* file, const Flight* pFlight);
+Flight*		readFlightFromBinFile(FILE* file, Plane* planeArr, int planeCount);
+int			saveFlightArrToBinFile(FILE* file, const Flight** flightArr, int flightCount);
+Flight**	readFlightArrFromBinFile(FILE* file, const Plane* planeArr, int planeCount, int* restoredCount);
 #endif

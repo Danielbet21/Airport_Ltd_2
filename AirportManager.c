@@ -6,9 +6,85 @@
 #include "AirportManager.h"
 #include "General.h"
 
-int	initManager(AirportManager* pManager){
-	L_init(&pManager->AirportList);
+int initManager(AirportManager* pManager, const char* fileName)
+{
+	if (fileName && loadManagerFromFile(pManager, fileName)) {
+		// success init from file
+		return 1;
+	}
+	if (L_init(&pManager->AirportList)) {
+		// success init list menually
+		return 2;
+	};
+	return 0;
+}
+
+int	saveManagerToFile(const AirportManager* pManager, const char* fileName) {
+	FILE* file = fopen(fileName, "w");
+	int res;
+	if (!file) {
+		printf("Error open file to write\n");
+		return 0;
+	}
+	int count = L_count(&pManager->AirportList);
+	NODE* ptr = pManager->AirportList.head.next;
+	fprintf(file, "%d\n", count);
+
+	while (ptr) {
+		Airport* pPort = (Airport*)ptr->key;
+		if (pPort == NULL) {
+			fclose(file);
+			return 0;
+		}
+		writeAirportToFile(file, pPort);
+		ptr = ptr->next;
+	}
+	fclose(file);
 	return 1;
+}
+
+int loadManagerFromFile(AirportManager* pManager, const char* fileName) {
+	FILE* file = fopen(fileName, "r");
+	if (!file) {
+		printf("Error open file to read\n");
+		return 0;
+	}
+	//TODO check if count == 0 need to print 0 
+	int count;
+	fscanf(file, "%d", &count);
+	if (count == 0) {
+		fclose(file);
+		return 0;
+	}
+	fgetc(file); // get to the next line
+	// init the list
+	if (!L_init(&pManager->AirportList)) {
+		fclose(file);
+		return 0;
+	}
+	// read the airports
+	for (int i = 0; i < count; i++) {
+		Airport* pPort = (Airport*)calloc(1, sizeof(Airport));
+		if (!pPort) {
+			return 0;
+		}
+		if (!readAirportFromFile(file, pPort)) {
+			freeAirport(pPort);
+			fclose(file);
+			return 0;
+		}
+
+		NODE* ptr1 = L_insertAirportSorted(&pManager->AirportList, pPort, AirportCompareCode);
+		if (!ptr1) {
+			freeAirport(pPort);
+			fclose(file);
+			return 0;
+		}
+	}
+
+	fclose(file);
+	return 1;
+
 }
 
 int	addAirport(AirportManager* pManager) {
@@ -75,7 +151,7 @@ Airport* findAirportByCode(const AirportManager* pManager, const char* code){
 		}
 		strcpy(pAir->code, code); //TODO: free pPort
 
-		NODE* res = L_find(pManager->AirportList.head.next, pAir, compareByCode);
+		const NODE* res = L_find(pManager->AirportList.head.next, pAir, compareByCode);
 		if (res == NULL) {
 			return NULL;
 		}
@@ -100,4 +176,23 @@ void printAirports(const AirportManager* pManager){
 
 void freeManager(AirportManager* pManager){
 	L_free(&pManager->AirportList, freeAirport);
+}
+
+
+int hasXorMoreAirports(const AirportManager* pManager, int x) {
+
+	int count = 0;
+	NODE* ptr = pManager->AirportList.head.next;
+	if (!ptr)
+		return 0;
+
+	while (ptr && count < x) {
+		count++;
+		ptr = ptr->next;
+	}
+
+	if (count >= x) {
+		return 1;
+	}
+	return 0;
 }

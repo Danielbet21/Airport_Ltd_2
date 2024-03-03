@@ -72,10 +72,132 @@ Airport* setAiportToFlight(const AirportManager* pManager, const char* msg)
 	return port;
 }
 
-void    compareFlightByDate(const void* flight1, const void* flight2) {
+int    compareFlightByDate(const void* flight1, const void* flight2) {
 	Flight* f1 = *(Flight**)flight1;
 	Flight* f2 = *(Flight**)flight2;
 
 	return compareDates(&f1->date, &f2->date);
 
+}
+
+int saveFlightToBinFile(FILE* file, const Flight* pFlight) {
+	if (file == NULL || pFlight == NULL) {
+		return 0;
+	}
+
+	// Write source code
+	if (fwrite(pFlight->sourceCode, sizeof(char), IATA_LENGTH, file) != IATA_LENGTH) {
+		return 0;
+	}
+
+	// Write destination code
+	if (fwrite(pFlight->destCode, sizeof(char), IATA_LENGTH, file) != IATA_LENGTH) {
+		return 0;
+	}
+	// Write plane Serial Number *ONLY*
+	if (!savePlaneSerialNumberBinFile(file, &pFlight->flightPlane)) {
+		return 0;
+	}
+	// Write date
+	if (!saveDateToBinFile(file, &pFlight->date)) {
+		return 0;
+	}
+	return 1;
+}
+
+
+Flight* readFlightFromBinFile(FILE* file, Plane* planeArr, int planeCount) {
+	// this function allocates memory for the flight and returns the flight *be careful*
+	if (file == NULL || planeArr == NULL || planeCount <= 0) {
+		return NULL;
+	}
+	char sourceCode[IATA_LENGTH + 1];
+	char destCode[IATA_LENGTH + 1];
+	// read source code
+	if (fread(sourceCode, sizeof(char), IATA_LENGTH, file) != IATA_LENGTH) {
+		return NULL;
+	}
+	sourceCode[IATA_LENGTH] = '\0'; // Add Null-terminate
+
+	// read destination code
+	if (fread(destCode, sizeof(char), IATA_LENGTH, file) != IATA_LENGTH) {
+		return NULL;
+	}
+	destCode[IATA_LENGTH] = '\0'; // Add Null-terminate
+
+	// read plane (use function that reads only serial number and return the plane)
+	Plane restoredPlane = readPlaneSerialNumberBinFile(file, planeArr, planeCount);
+	if (restoredPlane.serialNum == -1) {
+		return NULL;
+	}
+
+	// read date
+	Date restoredDate = readDateFromBinFile(file);
+	if (restoredDate.year == 0) {
+		return NULL;
+	}
+
+	Flight* pFlight = (Flight*)malloc(sizeof(Flight));
+	if (!pFlight) {
+		return NULL;
+	}
+
+	strcpy(pFlight->sourceCode, sourceCode);
+	strcpy(pFlight->destCode, destCode);
+	pFlight->flightPlane = restoredPlane;
+	pFlight->date = restoredDate;
+
+	return pFlight;
+}
+
+
+int saveFlightArrToBinFile(FILE* file, const Flight** flightArr, int flightCount) {
+	if (file == NULL || flightArr == NULL || flightCount <= 0) {
+		return 0;
+	}
+	// Write number of flights
+	if (!writeGeneralToBinFile(file, &flightCount, sizeof(int))) {
+		return 0;
+	}
+	// Write each flight
+	for (int i = 0; i < flightCount; i++)
+	{
+		if (!saveFlightToBinFile(file, flightArr[i])) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
+Flight** readFlightArrFromBinFile(FILE* file, const Plane* planeArr, int planeCount, int* restoredCount) {
+	// this function allocates memory for the flights and returns the flights *be careful*
+	if (file == NULL || planeArr == NULL || planeCount <= 0) {
+		return NULL;
+	}
+	// Read number of flights
+	int tempCount;
+	if (!readGeneralFromBinFile(file, &tempCount, sizeof(int))) {
+		return NULL;
+	}
+	// allocate memory for the flights
+	Flight** flightArr = (Flight**)malloc(tempCount * sizeof(Flight*));
+
+	// add each flight to the array
+	for (int i = 0; i < tempCount; i++) {
+		Flight* tempFlight = readFlightFromBinFile(file, planeArr, planeCount);
+		// if reading falied free all the flights that were read and return NULL
+		if (tempFlight == NULL) {
+			// free all the flights that were read
+			for (int j = 0; j < i; j++) {
+				free(flightArr[j]);
+			}
+			*restoredCount = -1;
+			return NULL;
+		}
+		flightArr[i] = tempFlight;
+	}
+
+	*restoredCount = tempCount;
+	return flightArr;
 }

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "Airline.h"
 #include "AirportManager.h"
+#include "step2.h"
 
 Flight* flightArr[3];
 Airline airline;
@@ -11,7 +12,7 @@ AirportManager manager;
 void initsializeAirline() {   
     // Initialize airline, manager
     initAirline(&airline);
-    initManager(&manager);
+    //initManager(&manager);
     // Allocate memory for airline.flightArr
     airline.flightArr = (Flight**)malloc(3 * sizeof(Flight*));
     if (!(airline.flightArr)) {

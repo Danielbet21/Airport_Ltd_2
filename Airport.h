@@ -10,6 +10,7 @@ typedef struct
 	char	code[IATA_LENGTH + 1];
 }Airport;
 
+int AirportCompareCode(const void* pPort1, const void* pPort2);
 int		isSameAirport(const Airport* pPort1, const Airport* pPort2);
 int		isAirportCode(const Airport* pPort1, const char* code); 
 int		initAirportNoCode(Airport* pPort);
@@ -21,5 +22,7 @@ void	changeName(char* name,int count, char** wordsArray);
 void    getAirportCode(char* code);
 void	printAirport(const void* pPort);
 void	freeAirport(Airport* pPort);
+void	writeAirportToFile(FILE* file, const Airport* pPort);
+int		readAirportFromFile(FILE* file, Airport* pPort);
 
 #endif

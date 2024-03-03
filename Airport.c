@@ -8,6 +8,17 @@
 
 #define SEP_CHAR '_'
 
+int AirportCompareCode(const void* pPort1, const void* pPort2) {
+	if (!pPort1 || !pPort2) {
+		return -1;
+	}
+
+
+	const Airport* port1 = (const Airport*)pPort1;
+	const Airport* port2 = (const Airport*)pPort2;
+	return (strcmp(port1->code, port2->code));
+}
+
 int	isSameAirport(const Airport* pPort1, const Airport* pPort2)
 {
 	if (!pPort1 || !pPort2)
@@ -166,3 +177,48 @@ void freeAirport(Airport* pPort){
 	free(pPort->country);
 }
 
+void writeAirportToFile(FILE* file, const Airport* pPort) {
+	fprintf(file, "%s\n", pPort->name);
+	fprintf(file, "%s\n", pPort->country);
+	fprintf(file, "%s\n", pPort->code);
+}
+
+
+int readAirportFromFile(FILE* file, Airport* pPort) {
+	char tempName[MAX_STR_LEN];
+	char tempCountry[MAX_STR_LEN];
+
+	// read name
+	if (fgets(tempName, MAX_STR_LEN, file) == NULL) {
+		return 0;
+	}
+
+	tempName[strcspn(tempName, "\n")] = '\0'; // Remove newline character
+
+	pPort->name = (char*)malloc((strlen(tempName) + 1) * sizeof(char));
+	if (!pPort->name) {
+		return 0;
+	}
+
+	strcpy(pPort->name, tempName);
+
+	// read country
+	if (fgets(tempCountry, MAX_STR_LEN, file) == NULL) {
+		return 0;
+	}
+	tempCountry[strcspn(tempCountry, "\n")] = '\0'; // Remove newline character
+
+	pPort->country = (char*)malloc((strlen(tempCountry) + 1) * sizeof(char));
+	if (!pPort->country) {
+		return 0;
+	}
+
+	strcpy(pPort->country, tempCountry);
+
+	// read code
+	if (fgets(pPort->code, IATA_LENGTH + 1, file) == NULL) {
+		return 0;
+	}
+	fgetc(file); // get to the next line
+	return 1;
+}
